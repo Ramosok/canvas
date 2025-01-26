@@ -121,47 +121,88 @@ const drawingCanvas = document.getElementById('drawingCanvas');
 const ctxDrawing = drawingCanvas.getContext('2d');
 const colorPicker = document.getElementById('colorPicker');
 const brushSize = document.getElementById('brushSize');
+const generateButton = document.getElementById('generateButton');
+const imageDisplay = document.getElementById('imageDisplay');
+const uploadButton = document.getElementById('uploadButton');
+const fileInput = document.getElementById('fileInput');   
 
 let drawing = false;
 let currentColor = colorPicker.value;
 let currentBrushSize = brushSize.value;
 
+ctxDrawing.fillStyle = 'white';
+ctxDrawing.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
 
-    colorPicker.addEventListener('input', () => {
-        currentColor = colorPicker.value;
-    });
 
-    brushSize.addEventListener('input', () => {
-        currentBrushSize = brushSize.value;
-    });
+colorPicker.addEventListener('input', () => {
+    currentColor = colorPicker.value;
+});
 
+brushSize.addEventListener('input', () => {
+    currentBrushSize = brushSize.value;
+});
 
 drawingCanvas.addEventListener('mousedown', (e) => {
-        drawing = true;
-        ctxDrawing.beginPath();
-        ctxDrawing.moveTo(e.offsetX, e.offsetY);
-    });
-
+    drawing = true;
+    ctxDrawing.beginPath();
+    ctxDrawing.moveTo(e.offsetX, e.offsetY);
+});
 
 drawingCanvas.addEventListener('mousemove', (e) => {
-        if (drawing) {
-            ctxDrawing.lineTo(e.offsetX, e.offsetY);
-            ctxDrawing.strokeStyle = currentColor;
-            ctxDrawing.lineWidth = currentBrushSize;
-            ctxDrawing.lineCap = 'round';
-            ctxDrawing.stroke();
-        }
-
-    });
+    if (drawing) {
+        ctxDrawing.lineTo(e.offsetX, e.offsetY);
+        ctxDrawing.strokeStyle = currentColor;
+        ctxDrawing.lineWidth = currentBrushSize;
+        ctxDrawing.lineCap = 'round';
+        ctxDrawing.stroke();
+    }
+});
 
 drawingCanvas.addEventListener('mouseup', () => {
-        drawing = false;
-        ctxDrawing.closePath();
-    });
+    drawing = false;
+    ctxDrawing.closePath();
+});
 
 drawingCanvas.addEventListener('mouseleave', () => {
-        drawing = false;
-        ctxDrawing.closePath();
-    });
+    drawing = false;
+    ctxDrawing.closePath();
+});
 
 
+function generateAndDisplayImage() {
+    const dataURL = drawingCanvas.toDataURL('image/jpeg');
+    imageDisplay.src = dataURL;
+
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'drawing.jpg';
+    link.textContent = 'Скачать изображение';
+    document.body.appendChild(link);
+}
+
+function loadImageToCanvas(file) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+            ctxDrawing.fillStyle = 'white';
+            ctxDrawing.fillRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            ctxDrawing.drawImage(img, 0, 0, drawingCanvas.width, drawingCanvas.height);
+        }
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+
+uploadButton.addEventListener('click', () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (file) {
+        loadImageToCanvas(file);
+    }
+});
+generateButton.addEventListener('click', generateAndDisplayImage);

@@ -50,3 +50,13 @@ body {
     border: 2px solid #000;
     cursor: pointer;
 }
+img {
+    margin-top: 20px;
+    border: 1px solid gray;
+    max-width: 100%;
+    display: block;
+}
+
+#fileInput {
+    display: none; /* Скрываем input */
+}
